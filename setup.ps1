@@ -82,28 +82,33 @@ $ffmpegExe = Join-Path $binDir "ffmpeg.exe"
 $ffprobeExe = Join-Path $binDir "ffprobe.exe"
 
 if (-not (Test-Path $ffmpegExe) -or -not (Test-Path $ffprobeExe)) {
-    Write-Host "[4/4] Downloading FFmpeg and FFprobe (portabel)..." -ForegroundColor Yellow
+    Write-Host "[4/4] Downloading FFmpeg and FFprobe (portabel - versi terbaru dengan GPU AMD/NVIDIA support)..." -ForegroundColor Yellow
     
-    $ffmpegZipUrl = "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/download/v4.4.1/ffmpeg-4.4.1-win-64.zip"
-    $ffprobeZipUrl = "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/download/v4.4.1/ffprobe-4.4.1-win-64.zip"
+    # Use gyan.dev essentials build which includes h264_amf, h264_nvenc, h264_qsv encoders
+    $ffmpegZipUrl = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
     
-    $ffmpegZipPath = Join-Path $projDir "ffmpeg.zip"
-    $ffprobeZipPath = Join-Path $projDir "ffprobe.zip"
+    $ffmpegZipPath = Join-Path $projDir "ffmpeg_release.zip"
     
-    Write-Host "Downloading ffmpeg.zip..." -ForegroundColor Gray
+    Write-Host "Downloading ffmpeg essentials build (GPU-enabled)..." -ForegroundColor Gray
     Invoke-WebRequest -Uri $ffmpegZipUrl -OutFile $ffmpegZipPath -UseBasicParsing
     
-    Write-Host "Downloading ffprobe.zip..." -ForegroundColor Gray
-    Invoke-WebRequest -Uri $ffprobeZipUrl -OutFile $ffprobeZipPath -UseBasicParsing
-    
     Write-Host "Extracting binaries..." -ForegroundColor Yellow
-    Expand-Archive -Path $ffmpegZipPath -DestinationPath $binDir -Force
-    Expand-Archive -Path $ffprobeZipPath -DestinationPath $binDir -Force
+    $tempExtractDir = Join-Path $projDir "ffmpeg_temp_extract"
+    Expand-Archive -Path $ffmpegZipPath -DestinationPath $tempExtractDir -Force
     
+    # Find the extracted folder (it will be named like ffmpeg-7.1-essentials_build)
+    $extractedDir = Get-ChildItem -Path $tempExtractDir -Directory | Select-Object -First 1
+    $ffmpegBinDir = Join-Path $extractedDir.FullName "bin"
+    
+    # Copy ffmpeg.exe and ffprobe.exe to our bin/ directory
+    Copy-Item -Path (Join-Path $ffmpegBinDir "ffmpeg.exe") -Destination $binDir -Force
+    Copy-Item -Path (Join-Path $ffmpegBinDir "ffprobe.exe") -Destination $binDir -Force
+    
+    # Cleanup
     Remove-Item $ffmpegZipPath -Force
-    Remove-Item $ffprobeZipPath -Force
+    Remove-Item $tempExtractDir -Recurse -Force
     
-    Write-Host "[OK] FFmpeg and FFprobe downloaded and set up." -ForegroundColor Green
+    Write-Host "[OK] FFmpeg and FFprobe (GPU-enabled build) downloaded and set up." -ForegroundColor Green
 } else {
     Write-Host "[OK] FFmpeg and FFprobe already exist in bin/ folder." -ForegroundColor Green
 }

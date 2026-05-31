@@ -244,27 +244,55 @@ def search_youtube_karaoke(artist, title):
                         if duration and duration > 600: # 10 mins
                             continue
                             
+                        # First pass: score based on title patterns only
                         score = score_youtube_title(entry_title, artist, title)
-                        score = adjust_score_for_popularity(score, entry)
                         
                         candidates.append({
                             'url': entry.get('url') or f"https://www.youtube.com/watch?v={entry['id']}",
                             'title': entry_title,
                             'duration': duration,
-                            'score': score
+                            'score': score,
+                            'entry_flat': entry
                         })
         except Exception:
             continue
 
-    # Sort candidates by score descending
     if candidates:
-        candidates.sort(key=lambda x: x['score'], reverse=True)
         valid_candidates = [c for c in candidates if c['score'] > 0]
         if valid_candidates:
+            # Sort by title-score descending to perform second-pass popularity scoring on top candidates
+            valid_candidates.sort(key=lambda x: x['score'], reverse=True)
+            
+            # Setup full ydl options to fetch view count and channel info
+            ydl_opts_full = dict(ydl_opts)
+            ydl_opts_full['extract_flat'] = False
+            
+            # Retrieve full metadata only for top 3 candidates
+            for c in valid_candidates[:3]:
+                try:
+                    with yt_dlp.YoutubeDL(ydl_opts_full) as ydl_full:
+                        full_info = ydl_full.extract_info(c['url'], download=False)
+                        if full_info:
+                            c['score'] = adjust_score_for_popularity(c['score'], full_info)
+                            c['title'] = full_info.get('title', c['title'])
+                            c['duration'] = full_info.get('duration', c['duration'])
+                except Exception:
+                    # Fallback to adjusting with flat entry if full info retrieval fails
+                    c['score'] = adjust_score_for_popularity(c['score'], c['entry_flat'])
+            
+            # Re-sort valid candidates after adjusting for popularity
+            valid_candidates.sort(key=lambda x: x['score'], reverse=True)
+            
+            # Clean up temporary entry_flat key
+            for c in valid_candidates:
+                c.pop('entry_flat', None)
+                
             return CandidateList(valid_candidates)
-        
+            
         # If no candidates have score > 0, raise the vocal exception using the highest score candidate
+        candidates.sort(key=lambda x: x['score'], reverse=True)
         best_candidate = candidates[0]
+        best_candidate.pop('entry_flat', None)
         raise Exception(f"Versi karaoke tidak ditemukan di YouTube (hanya ditemukan versi vokal: '{best_candidate['title']}')")
         
     raise Exception("Lagu tidak ditemukan di YouTube.")

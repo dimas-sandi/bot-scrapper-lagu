@@ -316,13 +316,14 @@ class KaraokeBot:
             
             self.finished_queue = []
             self.first_draw = True
-            self.tui_height = 38 # Consistent height for Server TUI (incorporates hardware rows)
+            self.last_tui_height = 0 # Dynamic height tracking for Server TUI
             
         else: # Client/Laptop Helper Mode
             self.max_workers = 10
             self.client_worker_states = [{"song": "", "phase": "Idle", "percent": 0} for _ in range(self.max_workers)]
             self.client_thread_to_worker = {}
             self.client_first_draw = True
+            self.client_last_tui_height = 0 # Dynamic height tracking for Client TUI
             
             # Client hardware variables (updated in background thread)
             self.client_hardware_data = {
@@ -1045,12 +1046,14 @@ class KaraokeBot:
         CL = "\033[K"
         output = f"{CL}\n".join(lines) + CL
         
-        if not self.first_draw:
-            sys.stdout.write(f"\033[{self.tui_height}A\r")
+        current_height = len(lines)
+        if not self.first_draw and self.last_tui_height > 0:
+            sys.stdout.write(f"\033[{self.last_tui_height}A\r")
             
         sys.stdout.write(output + "\n")
         sys.stdout.flush()
         self.first_draw = False
+        self.last_tui_height = current_height
 
     def dashboard_loop(self):
         while self.running:
@@ -1150,11 +1153,13 @@ class KaraokeBot:
         CL = "\033[K"
         output = f"{CL}\n".join(lines) + CL
         
-        if not self.client_first_draw:
-            sys.stdout.write(f"\033[17A\r")
+        current_height = len(lines)
+        if not self.client_first_draw and getattr(self, 'client_last_tui_height', 0) > 0:
+            sys.stdout.write(f"\033[{self.client_last_tui_height}A\r")
         sys.stdout.write(output + "\n")
         sys.stdout.flush()
         self.client_first_draw = False
+        self.client_last_tui_height = current_height
 
     def client_reporter_loop(self):
         """Sends heartbeats and hardware data to PC server."""
