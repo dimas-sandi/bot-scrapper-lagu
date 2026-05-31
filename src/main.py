@@ -413,13 +413,16 @@ class KaraokeBot:
             tmp_path = self.history_path + ".tmp"
             with open(tmp_path, 'w', encoding='utf-8') as f:
                 json.dump(history_copy, f, indent=2)
-            os.replace(tmp_path, self.history_path)
+            
+            # Retry os.replace a few times in case the file is temporarily locked by Windows/Antivirus
+            for _ in range(5):
+                try:
+                    os.replace(tmp_path, self.history_path)
+                    break
+                except PermissionError:
+                    time.sleep(0.5)
         except Exception:
-            try:
-                with open(self.history_path, 'w', encoding='utf-8') as f:
-                    json.dump(history_copy, f, indent=2)
-            except:
-                pass
+            pass
 
     def update_clean_playlist_excel(self, force=False):
         if not force and self.running:

@@ -5,7 +5,7 @@
   "max_resolution": "720p",
   "min_disk_free_mb": 500,
   "max_workers": 6,
-  "default_output_dir": "E:\\Karaoke_Downloads",
+  "default_output_dir": "D:\\Karaoke_Downloads",
   "use_gpu_acceleration": true,
   "gpu_encoder": "h264_amf",
   "max_gpu_sessions": 2,
