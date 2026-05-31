@@ -102,7 +102,7 @@ class StorageManager:
             else:
                 print(f"[Peringatan Kritis] Tidak ada drive cadangan yang cukup lega! Tetap menggunakan penyimpanan aktif: {self.active_dir}")
                 
-        # Resolve song subdirectories
-        target_folder = os.path.join(self.active_dir, category, artist)
+        # Resolve song subdirectories (mengabaikan kategori/genre)
+        target_folder = os.path.join(self.active_dir, artist)
         os.makedirs(target_folder, exist_ok=True)
         return target_folder
