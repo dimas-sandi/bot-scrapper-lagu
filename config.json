@@ -1,0 +1,17 @@
+{
+  "excel_path": "D:\\list lagu.xls",
+  "target_size_mb": 15.0,
+  "audio_bitrate_kbps": 192,
+  "max_resolution": "720p",
+  "min_disk_free_mb": 500,
+  "max_workers": 6,
+  "default_output_dir": "E:\\Karaoke_Downloads",
+  "use_gpu_acceleration": true,
+  "gpu_encoder": "h264_amf",
+  "max_gpu_sessions": 2,
+  "network": {
+    "role": "server",
+    "server_ip": "192.168.110.131",
+    "server_port": 8080
+  }
+}

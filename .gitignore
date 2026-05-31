@@ -1,0 +1,36 @@
+# Portables and Binaries
+python_embed/
+bin/
+*.exe
+*.dll
+
+# Temporary Files
+temp/
+scratch/tmp/
+.system_generated/
+.gemini/
+brain/
+*corrupted
+
+# Downloaded Videos and Media
+*.mp4
+*.mkv
+*.avi
+*.mp3
+
+# Databases, Spreadsheets, and Data files
+*.xlsx
+*.xls
+*.csv
+download_history.json
+genre_repair_bot/genre_repair_history.json
+genre_repair_bot/*.csv
+chordtela_generator/*.csv
+chordtela_generator/*.json
+
+# Logs and system files
+*.log
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc

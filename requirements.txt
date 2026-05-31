@@ -1,0 +1,7 @@
+yt-dlp
+pandas
+openpyxl
+xlrd
+tqdm
+psutil
+colorama
