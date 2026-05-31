@@ -106,11 +106,21 @@ def score_youtube_title(title, artist, song_title):
     # 5. Check for relevance of Song Title
     words = re.findall(r'\w+', song_title_lower)
     match_words = 0
-    for w in words:
-        if len(w) > 1 and w in title_lower:
+    valid_words = [w for w in words if len(w) > 1]
+    if not valid_words and words:
+        valid_words = words
+        
+    for w in valid_words:
+        if w in title_lower:
             match_words += 1
-    if len(words) > 0:
-        score += int((match_words / len(words)) * 10)
+            
+    if len(valid_words) > 0:
+        match_ratio = match_words / len(valid_words)
+        score += int(match_ratio * 15)
+        
+        # Strict Title Requirement: If title match is extremely poor, heavily penalize it
+        if match_ratio < 0.4:
+            score -= 50
         
     # 6. Check for relevance of Artist
     artist_words = re.findall(r'\w+', artist_lower)
