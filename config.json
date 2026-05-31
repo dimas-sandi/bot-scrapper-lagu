@@ -1,6 +1,6 @@
 {
   "excel_path": "C:\Users\DIMPI\.gemini\antigravity-ide\scratch\youtube_karaoke_downloader\chordtela_generator\list_lagu_chordtela.xlsx",
-  "target_size_mb": 15.0,
+  "target_size_mb": 20.0,
   "audio_bitrate_kbps": 192,
   "max_resolution": "720p",
   "min_disk_free_mb": 500,

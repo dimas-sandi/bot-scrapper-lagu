@@ -337,7 +337,7 @@ class KaraokeBot:
     def load_config(self):
         default_config = {
             "excel_path": "D:\\list lagu.xls",
-            "target_size_mb": 15.0,
+            "target_size_mb": 20.0,
             "audio_bitrate_kbps": 192,
             "max_resolution": "720p",
             "min_disk_free_mb": 500,
