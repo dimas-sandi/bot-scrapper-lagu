@@ -122,13 +122,15 @@ def score_youtube_title(title, artist, song_title):
         score += int((match_artist / len(artist_words)) * 10)
         
     # 7. Prioritize new/remake/cover versions for better audio/video quality (+15 score)
-    remake_keywords = [
-        'remake', 'cover', 'acoustic', 'akustik', 'piano', 'midi', 'keyboard', 
-        'hd', '1080p', '720p', 'clean audio', 'high quality', 'hq', 'lirik cover'
-    ]
-    for kw in remake_keywords:
-        if kw in title_lower:
-            score += 15
+    # ONLY IF it is already identified as a karaoke track!
+    if has_positive:
+        remake_keywords = [
+            'remake', 'cover', 'acoustic', 'akustik', 'piano', 'midi', 'keyboard', 
+            'hd', '1080p', '720p', 'clean audio', 'high quality', 'hq', 'lirik cover'
+        ]
+        for kw in remake_keywords:
+            if kw in title_lower:
+                score += 15
             
     # 8. Deprioritize old/original/rip versions with lower quality (-12 score)
     original_keywords = [
@@ -138,6 +140,11 @@ def score_youtube_title(title, artist, song_title):
     for kw in original_keywords:
         if kw in title_lower:
             score -= 12
+            
+    # 9. Strict Requirement: If no explicit karaoke/instrumental keyword is found, 
+    # it is highly likely a vocal track. Heavily penalize it so it drops below 0.
+    if not has_positive:
+        score -= 50
             
     return score
 
