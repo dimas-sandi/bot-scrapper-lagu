@@ -63,7 +63,7 @@ def score_youtube_title(title, artist, song_title):
     ]
     for kw in super_positives:
         if kw in title_lower:
-            score += 35
+            score += 100
             has_positive = True
             
     # 2. General Positive Keywords: Karaoke/Instrumental (+20 points)
@@ -73,7 +73,7 @@ def score_youtube_title(title, artist, song_title):
     ]
     for kw in general_positives:
         if kw in title_lower:
-            score += 20
+            score += 100
             has_positive = True
             
     # 3. Hard negative keywords: Explicitly contains vocals (Extremely penalized: -100 points)

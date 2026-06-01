@@ -9,7 +9,7 @@ def main():
     bin_dir = os.path.join(proj_dir, "bin")
     os.makedirs(bin_dir, exist_ok=True)
     
-    zip_url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+    zip_url = "https://github.com/GyanD/codexffmpeg/releases/download/7.1/ffmpeg-7.1-essentials_build.zip"
     zip_path = os.path.join(proj_dir, "ffmpeg_release.zip")
     
     print("==================================================")
