@@ -76,7 +76,7 @@ def score_youtube_title(title, artist, song_title):
             score += 20
             has_positive = True
             
-    # 3. Hard negative keywords: Explicitly contains vocals (Extremely penalized: -45 points)
+    # 3. Hard negative keywords: Explicitly contains vocals (Extremely penalized: -100 points)
     # Bypass this penalty if the title contains multiplex tags, as vocals can be turned off/removed
     if not has_multiplex:
         hard_negatives = [
@@ -85,23 +85,28 @@ def score_youtube_title(title, artist, song_title):
             'clean vocals', 'vocal saja', 'lyric video with vocal',
             '+ vocal', '+ vokal', 'plus vocal', 'plus vokal',
             '(vocal)', '(vokal)', 'w/ vocal', 'w/vocal', 'vocals included',
-            'with singer', 'ada penyanyi', 'vokal ada', 'vocals on'
+            'with singer', 'ada penyanyi', 'vokal ada', 'vocals on',
+            'vokal asli', 'suara asli', 'audio asli', 'official music video',
+            'official video', 'official audio', 'official lyric', 'official lirik',
+            'live performance', 'live concert', 'full song', 'full audio',
+            'live acoustic', 'live version'
         ]
         for kw in hard_negatives:
             if kw in title_lower:
-                score -= 45
+                score -= 100
             
-    # 4. Soft negative keywords (only penalized if NO positive keyword is found)
-    # This prevents penalizing titles like "Official Karaoke Video" or "Original Instrumental"
-    soft_negatives = ['original song', 'official music video', 'official video', 'official audio', 'original audio', 'live performance']
-    if not has_positive:
-        for kw in soft_negatives:
-            if kw in title_lower:
-                score -= 25
+    # 4. Soft negative keywords (Penalized to reduce priority)
+    soft_negatives = ['original song', 'live', 'concert', 'konser', 'lirik lagu']
+    for kw in soft_negatives:
+        if kw in title_lower:
+            score -= 15
             
-    # 5. Handle lyric videos (usually contain vocals unless marked as karaoke)
-    if ('lyric' in title_lower or 'lirik' in title_lower) and not has_positive:
-        score -= 20
+    # 5. Handle lyric videos (usually contain vocals unless explicitly marked as karaoke/instrumental)
+    if ('lyric' in title_lower or 'lirik' in title_lower):
+        if not has_positive:
+            score -= 40
+        else:
+            score -= 10 # Slight penalty to prioritize pure karaoke over lyric videos if both exist
         
     # 5. Check for relevance of Song Title
     words = re.findall(r'\w+', song_title_lower)
